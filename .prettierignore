@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+.next/
+out/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Build artifacts
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Temporary folders
+tmp/
+temp/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Package manager
+.pnpm-debug.log*
+.yarn-integrity
+
+# Next.js specific
+.next/sw.js
+.next/sourcemaps/
+
+# Testing
+coverage/
+
+# Supabase
+.supabase/

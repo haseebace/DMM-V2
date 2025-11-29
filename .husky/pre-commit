@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+
+echo "🔍 Running pre-commit checks..."
+
+# Run lint-staged
+npx lint-staged
+
+# Type check
+echo "📝 Running TypeScript type checking..."
+npm run type-check
+
+# Run tests if available
+echo "🧪 Running tests..."
+if [ -f "package.json" ] && grep -q '"test"' package.json; then
+    npm run test || true # Allow tests to fail during early development
+else
+    echo "⚠️  Tests not yet configured - skipping"
+fi
+
+echo "✅ Pre-commit checks completed!"

@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+
+echo "=€ Running pre-push checks..."
+
+# Full test run
+echo ">ê Running complete test suite..."
+if [ -f "package.json" ] && grep -q '"test"' package.json; then
+    npm run test
+else
+    echo "   Tests not yet configured - skipping test run"
+fi
+
+# Build check
+echo "<×  Running build check..."
+npm run build
+
+echo " Pre-push checks completed!"
