@@ -36,6 +36,7 @@ export const realDebridConfig: RealDebridConfig = {
   apiBaseUrl: 'https://api.real-debrid.com/rest/1.0',
   scope: 'unrestrict torrents downloads user', // Open source app scope
   grantType: 'http://oauth.net/grant_type/device/1.0',
+  expiresInSeconds: 3600,
   pollingInterval: 5000, // 5 seconds
   maxPollingAttempts: 120, // 10 minutes max polling time
 }

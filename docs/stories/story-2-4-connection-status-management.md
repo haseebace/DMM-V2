@@ -1192,30 +1192,30 @@ This section **MUST** be completed and validated before this story can be marked
 
 #### **Connection State Management Constraints**
 
-- [ ] **Zustand Store Implementation**: Connection state is properly managed with Zustand store
-- [ ] **State Transitions**: All connection states (disconnected, connecting, connected, error, expired) work correctly
-- [ ] **React Query Integration**: Real-time connection status updates work with React Query
-- [ ] **Supabase Integration**: Token validation and user data retrieval work correctly with Supabase
+- [x] **Zustand Store Implementation**: Connection state is properly managed with Zustand store _(see `src/stores/connection-store.ts`)_
+- [x] **State Transitions**: All connection states (disconnected, connecting, connected, error, expired) work correctly _(driven by `useAuthStore` + `useConnectionStore`)_
+- [x] **React Query Integration**: Real-time connection status updates work with React Query _(via `src/hooks/use-connection-status.ts`)_
+- [x] **Supabase Integration**: Token validation and user data retrieval work correctly with Supabase _(handled in `src/app/api/connection/route.ts`)_
 - [ ] **State Persistence**: Connection state persists across page reloads and browser sessions
-- [ ] **State Reset**: Proper state reset and cleanup methods are implemented
+- [x] **State Reset**: Proper state reset and cleanup methods are implemented _(see `clearConnection` + `/api/connection` DELETE)_
 
 #### **Connection Status Validation Constraints**
 
-- [ ] **Token Validation**: Access token validation works correctly with proper expiration handling
-- [ ] **User Data Retrieval**: Real-Debrid user information is retrieved and stored properly
-- [ ] **API Health Checking**: Real-Debrid API health status is monitored and reported
-- [ ] **Error Detection**: Connection errors are detected and categorized appropriately
-- [ ] **Status Updates**: Real-time status updates work without page refresh
+- [x] **Token Validation**: Access token validation works correctly with proper expiration handling _(implemented in `useConnectionStore.validateTokens`)_
+- [x] **User Data Retrieval**: Real-Debrid user information is retrieved and stored properly _(served from `/api/connection`)_
+- [x] **API Health Checking**: Real-Debrid API health status is monitored and reported _(RealDebridService `healthCheck` wired into the connection API)_
+- [x] **Error Detection**: Connection errors are detected and categorized appropriately _(API + card show actionable errors)_
+- [x] **Status Updates**: Real-time status updates work without page refresh _(React Query keeps the store fresh)_
 - [ ] **Reconnection Logic**: Automatic reconnection attempts work when tokens expire
 
 #### **Connection Management UI Constraints**
 
-- [ ] **Connection Status Card**: Status display component shows all required information
-- [ ] **Manual Sync Controls**: Manual sync trigger and progress indicators work correctly
-- [ ] **Disconnect Button**: Account disconnection with proper confirmation dialog works
-- [ ] **Error Display**: Connection errors are displayed with actionable guidance
-- [ ] **Loading States**: Appropriate loading states and progress indicators are provided
-- [ ] **Account Information**: User details (username, account type, avatar) display correctly
+- [x] **Connection Status Card**: Status display component shows all required information _(see `ConnectionCard` + `/settings`)_
+- [x] **Manual Sync Controls**: Manual sync trigger and progress indicators work correctly _(manual sync section integrates `useSyncOperations`)_
+- [x] **Disconnect Button**: Account disconnection with proper confirmation dialog works _(AlertDialog wraps the disconnect button)_
+- [x] **Error Display**: Connection errors are displayed with actionable guidance _(Alerts surface API/store errors)_
+- [x] **Loading States**: Appropriate loading states and progress indicators are provided _(spinners + progress bars in the card)_
+- [x] **Account Information**: User details (username, account type, avatar) display correctly _(user block in `ConnectionCard`)_
 
 #### **API Integration Constraints**
 

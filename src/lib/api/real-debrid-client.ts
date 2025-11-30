@@ -435,10 +435,12 @@ export class RealDebridApiClient {
 
   private async executeTokenRefresh(record: TokenRecord): Promise<string | null> {
     try {
+      const clientSecret = record.client_secret as string
+      const refreshToken = record.refresh_token as string
       const params = new URLSearchParams({
         client_id: realDebridConfig.clientId,
-        client_secret: record.client_secret,
-        code: record.refresh_token,
+        client_secret: clientSecret,
+        code: refreshToken,
         grant_type: realDebridConfig.grantType || 'http://oauth.net/grant_type/device/1.0',
       })
 
@@ -524,6 +526,11 @@ export class RealDebridApiClient {
       resetTime: snapshot.lastRefill + snapshot.config.windowMs,
       config: { ...snapshot.config },
     }
+  }
+
+  clearCachedToken(): void {
+    this.cachedToken = null
+    this.refreshPromise = null
   }
 
   // HTTP method helpers

@@ -152,6 +152,29 @@ describe('RealDebridApiClient', () => {
 
       rateLimitAuthSpy.mockRestore()
     })
+
+    it('should process large request bursts without starvation', async () => {
+      const fastClient = new RealDebridApiClient({
+        rateLimitConfig: {
+          requestsPerMinute: 6000,
+          burstSize: 100,
+          windowMs: 60000,
+        },
+      })
+
+      const authSpy = vi.spyOn(fastClient as any, 'getAuthToken').mockResolvedValue('mock-token')
+      fetchMock.mockImplementation(() => Promise.resolve(createFetchResponse({ data: { data: 'ok' } })))
+
+      const start = Date.now()
+      const requests = Array.from({ length: 100 }, (_, index) => fastClient.get(`/stress?i=${index}`))
+      await Promise.all(requests)
+      const elapsed = Date.now() - start
+
+      expect(fetchMock).toHaveBeenCalledTimes(100)
+      expect(elapsed).toBeLessThan(2000)
+
+      authSpy.mockRestore()
+    })
   })
 
   describe('Request Deduplication', () => {

@@ -7,6 +7,9 @@
 
 import { realDebridConfig } from '@/lib/api/real-debrid-config'
 
+const normalizeError = (error: unknown): Error =>
+  error instanceof Error ? error : new Error(String(error))
+
 export interface DeviceCodeResponse {
   device_code: string
   user_code: string
@@ -122,20 +125,21 @@ export async function requestDeviceCode(): Promise<DeviceCodeResponse> {
       interval: data.interval || 5,
     }
   } catch (error) {
-    console.error('❌ Network error in requestDeviceCode:', error)
+    const err = normalizeError(error)
+    console.error('❌ Network error in requestDeviceCode:', err)
 
     // Handle specific error types
-    if (error instanceof RealDebridOAuthError) {
-      throw error
+    if (err instanceof RealDebridOAuthError) {
+      throw err
     }
 
-    if (error instanceof TypeError) {
-      if (error.message.includes('Failed to fetch')) {
+    if (err instanceof TypeError) {
+      if (err.message.includes('Failed to fetch')) {
         throw new RealDebridOAuthError(
           'CORS/Network Error: Unable to connect to Real-Debrid API. The API may not allow requests from your current domain (localhost).',
           'CORS_ERROR'
         )
-      } else if (error.message.includes('NetworkError')) {
+      } else if (err.message.includes('NetworkError')) {
         throw new RealDebridOAuthError(
           'Network Error: Unable to reach Real-Debrid API. Please check your internet connection.',
           'NETWORK_ERROR'
@@ -143,7 +147,7 @@ export async function requestDeviceCode(): Promise<DeviceCodeResponse> {
       }
     }
 
-    if (error.name === 'AbortError') {
+    if (err.name === 'AbortError') {
       throw new RealDebridOAuthError(
         'Request timeout - Unable to connect to Real-Debrid API within 10 seconds',
         'TIMEOUT_ERROR'
@@ -151,7 +155,7 @@ export async function requestDeviceCode(): Promise<DeviceCodeResponse> {
     }
 
     throw new RealDebridOAuthError(
-      `Network error requesting device code: ${error.message || error}`,
+      `Network error requesting device code: ${err.message}`,
       'NETWORK_ERROR'
     )
   }
@@ -247,19 +251,20 @@ export async function requestDeviceCredentials(
 
     return pollCredentials()
   } catch (error) {
-    console.error('❌ Network error in requestDeviceCredentials:', error)
+    const err = normalizeError(error)
+    console.error('❌ Network error in requestDeviceCredentials:', err)
 
-    if (error instanceof RealDebridOAuthError) {
-      throw error
+    if (err instanceof RealDebridOAuthError) {
+      throw err
     }
 
-    if (error instanceof TypeError) {
-      if (error.message.includes('Failed to fetch')) {
+    if (err instanceof TypeError) {
+      if (err.message.includes('Failed to fetch')) {
         throw new RealDebridOAuthError(
           'CORS/Network Error: Unable to connect to Real-Debrid API. The API may not allow requests from your current domain (localhost).',
           'CORS_ERROR'
         )
-      } else if (error.message.includes('NetworkError')) {
+      } else if (err.message.includes('NetworkError')) {
         throw new RealDebridOAuthError(
           'Network Error: Unable to reach Real-Debrid API. Please check your internet connection.',
           'NETWORK_ERROR'
@@ -268,7 +273,7 @@ export async function requestDeviceCredentials(
     }
 
     throw new RealDebridOAuthError(
-      `Network error requesting device credentials: ${error.message || error}`,
+      `Network error requesting device credentials: ${err.message}`,
       'NETWORK_ERROR'
     )
   }
@@ -395,11 +400,12 @@ export async function pollForAuthorization(
         response.status
       )
     } catch (error) {
-      if (error instanceof RealDebridOAuthError) {
-        throw error
+      const err = normalizeError(error)
+      if (err instanceof RealDebridOAuthError) {
+        throw err
       }
 
-      console.error('❌ Network error during polling:', error)
+      console.error('❌ Network error during polling:', err)
       // Network error, continue polling
       await new Promise((resolve) => setTimeout(resolve, pollingInterval))
       return poll()
@@ -464,8 +470,9 @@ export async function startOAuthFlow(
 
     return { oauthState: updatedOAuthState, tokenResponse }
   } catch (error) {
-    console.error('❌ OAuth flow failed:', error)
-    throw error
+    const err = normalizeError(error)
+    console.error('❌ OAuth flow failed:', err)
+    throw err
   }
 }
 

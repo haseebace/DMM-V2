@@ -30,6 +30,9 @@ import { useRealDebridStatus } from '@/hooks/use-real-debrid-status'
 
 type ConnectionState = 'idle' | 'generating' | 'waiting' | 'polling' | 'success' | 'error'
 
+const getErrorMessage = (error: unknown): string =>
+  error instanceof Error ? error.message : String(error)
+
 export default function ConnectionPage() {
   const [connectionState, setConnectionState] = useState<ConnectionState>('idle')
   const [deviceCodeResponse, setDeviceCodeResponse] = useState<DeviceCodeResponse | null>(null)
@@ -88,9 +91,10 @@ export default function ConnectionPage() {
       }
 
       addLog('💾 Real-Debrid tokens saved.')
-    } catch (error: any) {
+    } catch (error) {
+      const message = getErrorMessage(error)
       console.error('Failed to persist Real-Debrid tokens', error)
-      addLog(`⚠️ Error saving tokens: ${error?.message || 'Unknown error'}`)
+      addLog(`⚠️ Error saving tokens: ${message}`)
     }
   }
 
@@ -113,8 +117,9 @@ export default function ConnectionPage() {
             setDeviceCodeResponse(deviceCodeData)
             setConnectionState('waiting')
           } catch (error) {
+            const message = getErrorMessage(error)
             console.error('❌ Error handling device code response:', error)
-            addLog(`❌ Device code handling error: ${error.message}`)
+            addLog(`❌ Device code handling error: ${message}`)
             setConnectionState('error')
             setError('Failed to process device code response')
           }
@@ -147,9 +152,9 @@ export default function ConnectionPage() {
           setConnectionState('idle')
         }, 3000)
       }
-    } catch (error: any) {
+    } catch (error) {
       setConnectionState('error')
-      const errorMessage = error?.message || 'Unknown error occurred'
+      const errorMessage = getErrorMessage(error)
       setError(errorMessage)
       addLog(`❌ Error: ${errorMessage}`)
       console.error('OAuth2 flow error:', error)
@@ -182,8 +187,9 @@ export default function ConnectionPage() {
       addLog('📋 User code copied to clipboard')
       toast.success('User code copied')
     } catch (copyError) {
+      const message = getErrorMessage(copyError)
       console.error('Failed to copy user code:', copyError)
-      addLog('⚠️ Failed to copy user code')
+      addLog(`⚠️ Failed to copy user code: ${message}`)
       toast.error('Failed to copy code')
     }
   }
@@ -350,7 +356,6 @@ export default function ConnectionPage() {
                         <AlertDialogAction
                           onClick={handleGoToRealDebrid}
                           disabled={connectionState === 'polling'}
-                          size="sm"
                           className="h-10 min-w-[10rem]"
                         >
                           <ExternalLink className="mr-2 h-4 w-4" />

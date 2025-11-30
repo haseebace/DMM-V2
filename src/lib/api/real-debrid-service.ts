@@ -44,10 +44,17 @@ export class RealDebridService {
       perPage: perPage.toString(),
       ...(search ? { search } : {}),
     })
-
-    const response = await realDebridClient.get<FilesResponse>(`/files?${params}`)
-    const data = this.unwrap(response, 'Failed to get files')
-    return data.files
+    try {
+      const response = await realDebridClient.get<FilesResponse>(`/files?${params}`)
+      const data = this.unwrap(response, 'Failed to get files')
+      return data.files
+    } catch (error) {
+      if (error instanceof RealDebridServiceError && error.status === 404) {
+        console.warn('Real-Debrid /files endpoint unavailable, falling back to /downloads')
+        return this.getDownloadsFallback(page, perPage, search)
+      }
+      throw error
+    }
   }
 
   async getFileById(id: string): Promise<RealDebridFile> {
@@ -156,6 +163,46 @@ export class RealDebridService {
     this.ensureSuccess(response, 'Failed to delete download')
   }
 
+  private async getDownloadsFallback(
+    page: number,
+    perPage: number,
+    search?: string
+  ): Promise<RealDebridFile[]> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      perPage: perPage.toString(),
+      ...(search ? { search } : {}),
+    })
+
+    const response = await realDebridClient.get<DownloadsResponse>(`/downloads?${params}`)
+    const data = this.unwrap(response, 'Failed to get downloads for sync')
+
+    return (data.downloads || []).map((download) => this.mapDownloadToFile(download))
+  }
+
+  private mapDownloadToFile(download: Download): RealDebridFile {
+    const fallbackName = download.filename || download.name || download.id
+    return {
+      id: download.id,
+      name: fallbackName,
+      size: download.size ?? 0,
+      hash: '',
+      mimetype: '',
+      created: download.generated,
+      modified: download.generated,
+      download: download.link || download.id,
+      link: download.link || '',
+      hoster: download.hoster || download.host || '',
+      host: download.host || '',
+      filename: download.filename || fallbackName,
+      extension: '',
+      mime: '',
+      icon: '',
+      path: '',
+      streamable: false,
+    }
+  }
+
   // Utility methods
   async healthCheck(): Promise<boolean> {
     try {
@@ -194,7 +241,7 @@ export class RealDebridService {
     }
   }
 
-  private raiseError(action: string, response: ApiResponse<any>): never {
+  private raiseError(action: string, response: ApiResponse<unknown>): never {
     const apiError =
       response.error ||
       RealDebridErrorHandler.createApiError(response.status, `${action}. Status ${response.status}`)

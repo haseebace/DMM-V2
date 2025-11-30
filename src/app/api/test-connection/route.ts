@@ -60,13 +60,15 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    const type = error instanceof Error ? error.constructor.name : typeof error
     console.error('❌ Server error:', error)
 
     return NextResponse.json(
       {
         success: false,
-        error: `Network error: ${error.message}`,
-        type: error.constructor.name,
+        error: `Network error: ${message}`,
+        type,
       },
       { status: 500 }
     )
