@@ -1,16 +1,44 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import localFont from 'next/font/local'
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
 
-const geistSans = Geist({
+const calSans = localFont({
+  src: '../../public/Cal_Sans,Poppins/Cal_Sans/CalSans-Regular.ttf',
   variable: '--font-geist-sans',
-  subsets: ['latin'],
+  display: 'swap',
 })
 
-const geistMono = Geist_Mono({
+const poppins = localFont({
+  src: [
+    {
+      path: '../../public/Cal_Sans,Poppins/Poppins/Poppins-Light.ttf',
+      weight: '300',
+      style: 'normal',
+    },
+    {
+      path: '../../public/Cal_Sans,Poppins/Poppins/Poppins-Regular.ttf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../public/Cal_Sans,Poppins/Poppins/Poppins-Medium.ttf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../../public/Cal_Sans,Poppins/Poppins/Poppins-SemiBold.ttf',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: '../../public/Cal_Sans,Poppins/Poppins/Poppins-Bold.ttf',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
   variable: '--font-geist-mono',
-  subsets: ['latin'],
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -25,7 +53,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${calSans.variable} ${poppins.variable} antialiased`}>
         {children}
         <Toaster />
       </body>
